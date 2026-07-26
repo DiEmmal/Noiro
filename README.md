@@ -1,6 +1,6 @@
-# LoggerTS
+# Noiro
 
-Logger is a small TypeScript logger to write and read logs by severity. It is designed as an educational project for learning Node.js, TypeScript, and software architecture.
+`Noiro` is a small TypeScript logger to write and read logs by severity. It is designed as an educational project for learning Node.js, TypeScript, and software architecture.
 
 ## Installation
 
@@ -22,7 +22,6 @@ npx tsx examples/read-logs.example.ts
 - Read logs by severity.
 - JSON-based log storage.
 - TypeScript support.
-- Simple and lightweight.
 
 ## Quick start
 
@@ -30,7 +29,12 @@ npx tsx examples/read-logs.example.ts
 import { createLogger, LogSeverity } from "../src/index.js";
 
 const logger = await createLogger({
-  path: 'application-logs',
+  logger: {
+    service: 'application-service',
+  },
+  file: {
+    path: 'example-logs',
+  }
 });
 
 await logger.debug('This is a debug log');
@@ -48,10 +52,11 @@ console.log(logs);
 
 ### Writing logs
 ```ts
-await logger.debug(message);
+await logger.debug(message, origin);
+// origin (string) property is optional
 await logger.info(message);
 await logger.warn(message);
-await logger.error(message);
+await logger.error(message, origin);
 await logger.fatal(message);
 ```
 
@@ -70,6 +75,8 @@ interface LogEntity {
     message: string;
     level: LogSeverity;
     timestamp: Date;
+    service: string;
+    origin: string;
 }
 ```
 
@@ -80,6 +87,7 @@ src/
   domain/
     entities/
     enums/
+    interfaces/
     repositories/
   infrastructure/
     repositories/

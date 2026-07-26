@@ -28,7 +28,12 @@ describe('FileLog Repository', () => {
     it.each(Object.values(LogSeverity) as LogSeverity[])('should save logs with $s severity', async (severity) => {
         const repository = await FileLogRepository.create({ path: testPath });
 
-        const log = new LogEntity({ level: severity, message: `${severity} test message` });
+        const log = new LogEntity({
+            level: severity,
+            message: `${severity} test message`,
+            origin: 'test.ts',
+            service: 'test',
+        });
 
         await repository.saveLog(log);
 
@@ -37,12 +42,15 @@ describe('FileLog Repository', () => {
         expect(logs[0]).toBeInstanceOf(LogEntity);
         expect(logs[0]?.level).toBe(log.level);
         expect(logs[0]?.message).toBe(log.message);
+        expect(logs[0]?.service).toBe(log.service);
+        expect(logs[0]?.origin).toBe(log.origin);
 
     });
 
     it('should read and return all logs', async () => {
         const repository = await FileLogRepository.create({ path: testPath });
         const severities = Object.values(LogSeverity);
+        const service = 'test', origin = 'test.ts';
 
         await Promise.all([
             severities.forEach(severity => {
@@ -50,6 +58,8 @@ describe('FileLog Repository', () => {
                 repository.saveLog(new LogEntity({
                     level: severity,
                     message: `Test ${severity} message`,
+                    origin,
+                    service,
                 }));
 
             })
@@ -59,14 +69,16 @@ describe('FileLog Repository', () => {
 
         expect(logs).toHaveLength(severities.length);
 
-        for(let severity of severities){
+        for (let severity of severities) {
 
             const log = logs.find(log => log.level === severity);
 
             expect(log?.level).toBe(severity);
             expect(log?.message).toBe(`Test ${severity} message`)
+            expect(log?.service).toBe(service)
+            expect(log?.origin).toBe(origin)
 
-        }
+        };
 
     });
 

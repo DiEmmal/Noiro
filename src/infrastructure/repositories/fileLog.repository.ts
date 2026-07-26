@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import { LogEntity, } from '../../domain/entities/log.entity.js';
 import type { LogRepository } from '../../domain/repositories/log.repository.js';
 import { LogSeverity } from '../../domain/enums/logSeverity.enum.js';
-import type { CreateLoggerOptions } from '../../interfaces/createLoggerOptions.interface.js';
+import type { FileRepositoryOptions } from '../../interfaces/createLoggerOptions.interface.js'
 
 export class FileLogRepository implements LogRepository {
     path: string;
@@ -16,11 +16,11 @@ export class FileLogRepository implements LogRepository {
         "fatal": 'fatalLogs.log',
     };
 
-    private constructor(options: CreateLoggerOptions) {
+    private constructor(options: FileRepositoryOptions) {
         this.path = options.path ?? 'logs';
     };
 
-    static async create(options: CreateLoggerOptions = {}) {
+    static async create(options: FileRepositoryOptions = {}) {
         const repository = new FileLogRepository(options);
         await repository.directoryVerification();
         return repository;
@@ -42,7 +42,7 @@ export class FileLogRepository implements LogRepository {
             .split("\n")
             .map(log => LogEntity.fromJSON(log))
             .filter(log => log instanceof LogEntity)
-            
+
         return logs;
     };
 

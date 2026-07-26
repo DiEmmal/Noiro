@@ -1,3 +1,12 @@
 export interface CreateLoggerOptions {
-    path?: string,
+    logger?: LoggerOptions
+    file?: FileRepositoryOptions,
+};
+
+export interface FileRepositoryOptions {
+    path?:string,
+};
+
+export interface LoggerOptions {
+    service?: string,
 }

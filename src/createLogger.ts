@@ -3,7 +3,10 @@ import type { CreateLoggerOptions } from "./interfaces/createLoggerOptions.inter
 import { Logger } from "./logger.js"
 
 export const createLogger = async (options: CreateLoggerOptions = {}): Promise<Logger> => {
-    const filesLogRepository = await FileLogRepository.create(options);
+    const fileLogRepository = await FileLogRepository.create(options.file);
 
-    return new Logger(filesLogRepository);
+    return new Logger(
+        fileLogRepository,
+        options.logger,
+    );
 };

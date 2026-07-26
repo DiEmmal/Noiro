@@ -8,6 +8,8 @@ describe('Log Entity', () => {
             message: 'Testing message',
             level: LogSeverity.info,
             timestamp: new Date(),
+            origin: 'test.ts',
+            service: 'test',
         }
 
         const newLogEntity = new LogEntity(newLog);
@@ -17,6 +19,8 @@ describe('Log Entity', () => {
         expect(newLogEntity.timestamp).toBeInstanceOf(Date);
         expect(Number.isNaN(newLogEntity.timestamp?.getTime())).toBe(false);
         expect(newLogEntity.timestamp?.getTime()).toBe(newLog.timestamp.getTime());
+        expect(newLogEntity.service).toBe(newLog.service);
+        expect(newLogEntity.origin).toBe(newLog.origin);
 
     });
 
@@ -24,6 +28,8 @@ describe('Log Entity', () => {
         const newLog = {
             message: 'Testing message',
             level: LogSeverity.info,
+            service: 'test',
+            origin: 'test.ts'
         };
         const newLogEntity = new LogEntity(newLog)
 
@@ -36,6 +42,8 @@ describe('Log Entity', () => {
             message: 'Testing message',
             level: LogSeverity.info,
             timestamp: new Date(),
+            service: 'test',
+            origin: 'test.ts'
         };
 
         const logStringify = JSON.stringify(newLog);
@@ -46,6 +54,8 @@ describe('Log Entity', () => {
         expect(log?.message).toBe(newLog.message);
         expect(log?.level).toBe(newLog.level);
         expect(log?.timestamp?.getTime()).toBe(newLog.timestamp.getTime());
+        expect(log?.service).toBe(newLog.service);
+        expect(log?.origin).toBe(newLog.origin);
 
     });
 

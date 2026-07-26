@@ -37,3 +37,8 @@
 * Added `CreateLoggerOptions` to simplify logger configuration.
 * Refactored the file repository to use asynchronous file operations with `fs/promises`.
 * Changed `createLogger()` to an asynchronous factory to ensure proper repository initialization.
+
+## 1.3.0 - 2026-07-26
+
+* Improved `CreateLoggerOptions` to better separate logger and repository configuration.
+* Added `service` and `origin` metadata to log entries.

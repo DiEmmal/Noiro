@@ -75,7 +75,6 @@ describe('Logger', () => {
             await logger[method](`Testing ${severity}`);
 
             expect(repository.saveLog).toHaveBeenCalled();
-            expect(repository.saveLog)
         }
     );
 
