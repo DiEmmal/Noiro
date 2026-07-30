@@ -24,24 +24,21 @@ export class FileLogRepository implements LogRepository {
         const repository = new FileLogRepository(options);
         await repository.directoryVerification();
         return repository;
-    }
-
-    async readLogs(severity?: LogSeverity): Promise<LogEntity[]> {
-        if (severity) return this.transformLogs(severity);
-        else return this.transformLogs();
     };
 
-    private async transformLogs(severity?: LogSeverity): Promise<LogEntity[]> {
+    async readLogs(severity?: LogSeverity): Promise<LogEntity[]> {
         let path: string;
         if (severity) path = `${this.path}/${this.logsFiles[severity]}`;
-        else path = `${this.path}/${this.logsFiles.all}`
-        const fileContent = await fs.readFile(path, 'utf-8')
+        else path = `${this.path}/${this.logsFiles.all}`;
 
-        const logs = fileContent
-            .trim()
-            .split("\n")
-            .map(log => LogEntity.fromJSON(log))
-            .filter(log => log instanceof LogEntity)
+        const fileContent = await fs.readFile(path, 'utf-8');
+
+        const stringLogs = fileContent
+        .trim()
+        .split("\n");
+
+        const logs = stringLogs
+        .map(log => LogEntity.fromJSON(log));
 
         return logs;
     };

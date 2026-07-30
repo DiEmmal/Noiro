@@ -42,3 +42,7 @@
 
 * Improved `CreateLoggerOptions` to better separate logger and repository configuration.
 * Added `service` and `origin` metadata to log entries.
+
+## 1.3.1 - 2026-07-30
+
+* Added validation for persisted log entries.

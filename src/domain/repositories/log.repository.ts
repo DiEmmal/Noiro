@@ -4,7 +4,6 @@ import type { LogSeverity } from "../enums/logSeverity.enum.js";
 export abstract class LogRepository {
     abstract readLogs(severity?: LogSeverity): Promise<LogEntity[]>;
     abstract saveLog(log: LogEntity): Promise<void>;
-
-    // TODO implementar los siguientes metodos
+    // TODO
     // abstract deleteLogs(): Promise<boolean>;
 };

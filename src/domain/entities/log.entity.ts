@@ -16,37 +16,38 @@ export class LogEntity {
         this.origin = log.origin;
     };
 
-    static fromJSON(content: string): LogEntity | null {
+    static fromJSON(content: string): LogEntity {
+        let log: any;
         try {
-            const log = JSON.parse(content);
-
-            if (typeof log !== "object" || log === null) return null;
-
-            if (typeof log.message !== 'string') return null;
-
-            if (typeof log.service !== 'string') return null;
-
-            if (typeof log.origin !== 'string') return null;
-
-            if (!Object.values(LogSeverity).includes(log.level)) return null;
-
-            if (log.timestamp && typeof log.timestamp === 'string') {
-                const date = new Date(log.timestamp);
-                if (isNaN(date.getTime())) return null;
-            } else return null;
-
-            const logEntity: LogEntity = new LogEntity({
-                ...log,
-                timestamp: new Date(log.timestamp),
-            });
-
-            return logEntity;
-
+            log = JSON.parse(content);
         } catch (error) {
 
-            return null;
+            throw (`fromJSON: invalid JSON`);
 
-        }
+        };
+
+        if (typeof log !== "object" || log === null) throw new Error('The log is not an object');
+
+        if (typeof log.message !== 'string') throw new Error('The log has not a valid message property');
+
+        if (typeof log.service !== 'string') throw new Error('The log has not a valid service property');
+
+        if (typeof log.origin !== 'string') throw new Error('The log has not a valid origin property');
+
+        if (!Object.values(LogSeverity).includes(log.level)) throw new Error('The log has not a valid level property');
+
+        if (log.timestamp && typeof log.timestamp === 'string') {
+            const date = new Date(log.timestamp);
+            if (isNaN(date.getTime())) throw new Error('The log has not a valid timestamp property');
+        } else throw new Error('The log has not a valid timestamp property');
+
+        const logEntity: LogEntity = new LogEntity({
+            ...log,
+            timestamp: new Date(log.timestamp),
+        });
+
+        return logEntity;
+
     };
 
 

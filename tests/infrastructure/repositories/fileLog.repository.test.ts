@@ -1,5 +1,5 @@
-import { it, expect, describe, beforeEach, test, afterEach } from "vitest"
-import { createLogger, LogSeverity } from "../../../src/index.js";
+import { it, expect, describe, beforeEach } from "vitest"
+import { LogSeverity } from "../../../src/index.js";
 import { FileLogRepository } from "../../../src/infrastructure/repositories/fileLog.repository.js";
 import { existsSync, rmSync } from 'fs';
 import { LogEntity } from "../../../src/domain/entities/log.entity.js";
