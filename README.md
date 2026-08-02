@@ -4,15 +4,16 @@
 
 ## Installation
 
-```bash
-npm install
-```
+This library has not prod dependencies
 
 To run the examples use the next scripts:
 
 ```bash
 npx tsx examples/create-logs.example.ts
 npx tsx examples/read-logs.example.ts
+npx tsx examples/read-logs-by-severity.example.ts
+npx tsx examples/delete-all-logs.example.ts
+npx tsx examples/delete-logs-by-options.ts
 ```
 
 
@@ -46,6 +47,8 @@ await logger.fatal('This is a fatal log');
 const logs = await logger.getLogsBySeverity(LogSeverity.error);
 
 console.log(logs);
+
+await logger.deleteLogs();
 ```
 
 ## API
@@ -68,6 +71,12 @@ await logger.getLogsBySeverity(severity);
 
 Returns an array of `LogEntity`.
 
+### Deleting logs
+
+```ts
+await logger.deleteLogs({ level, olderThan, origin });
+```
+
 ### LogEntity
 
 ```ts
@@ -89,6 +98,7 @@ src/
     enums/
     interfaces/
     repositories/
+    types/
   infrastructure/
     repositories/
   interfaces/

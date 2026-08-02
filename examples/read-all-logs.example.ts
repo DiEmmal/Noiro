@@ -1,4 +1,4 @@
-import { logger } from "./index.example";
+import { logger } from "./index.example.js";
 
 const allLogs = await logger.getAllLogs();
 

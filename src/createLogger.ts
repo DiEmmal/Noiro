@@ -1,4 +1,4 @@
-import { FileLogRepository } from "./infrastructure/repositories/fileLog.repository.js";
+import { FileLogRepository } from "./infrastructure/repositories/file-log.repository.js";
 import type { CreateLoggerOptions } from "./interfaces/createLoggerOptions.interface.js";
 import { Logger } from "./logger.js"
 

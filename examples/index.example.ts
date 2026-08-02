@@ -1,4 +1,4 @@
-import { createLogger } from "../src";
+import { createLogger } from "../src/index.js";
 
 export const logger = await createLogger({
     file: {

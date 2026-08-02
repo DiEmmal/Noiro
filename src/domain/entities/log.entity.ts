@@ -1,5 +1,6 @@
 import { LogSeverity } from "../enums/logSeverity.enum.js";
 import type { CreateLogEntity } from "../interfaces/createLogEntity.interface.js";
+import type { Days } from "../types/days.type.js"
 
 export class LogEntity {
     message: string;
@@ -41,14 +42,22 @@ export class LogEntity {
             if (isNaN(date.getTime())) throw new Error('The log has not a valid timestamp property');
         } else throw new Error('The log has not a valid timestamp property');
 
-        const logEntity: LogEntity = new LogEntity({
+        const newLog: LogEntity = new LogEntity({
             ...log,
             timestamp: new Date(log.timestamp),
         });
 
-        return logEntity;
+        return newLog;
 
     };
+
+    public static isOlderThan(log: LogEntity, days: Days) {
+
+        const miliseconds = days * 1000 * 60 * 60 * 24;
+
+        return Date.now() - log.timestamp.getTime() > miliseconds;
+
+    }
 
 
 };

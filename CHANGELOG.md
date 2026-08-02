@@ -46,3 +46,8 @@
 ## 1.3.1 - 2026-07-30
 
 * Added validation for persisted log entries.
+
+## 1.4.0 - 2026-08-01
+
+* Added new method `deleteLogs()`.
+* Refactored file repository path unions.

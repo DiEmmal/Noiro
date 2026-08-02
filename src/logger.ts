@@ -2,15 +2,20 @@ import { LogEntity } from "./domain/entities/log.entity.js";
 import type { LogRepository } from "./domain/repositories/log.repository.js";
 import { LogSeverity } from "./domain/enums/logSeverity.enum.js";
 import type { LoggerOptions } from "./interfaces/createLoggerOptions.interface.js";
+import type { DeleteLogsOptions } from "./domain/interfaces/deleteLogsOptions.interface.js";
 
 export class Logger {
     private readonly service: string;
 
     constructor(
         private readonly logRepository: LogRepository,
-        options?: LoggerOptions,    
+        options?: LoggerOptions,
     ) {
         this.service = options?.service ?? 'application-service'
+    };
+
+    async deleteLogs(options: DeleteLogsOptions = {}): Promise<void> {
+        return this.logRepository.deleteLogs(options);
     };
 
     async getLogsBySeverity(severityLevel: LogSeverity): Promise<LogEntity[]> {
