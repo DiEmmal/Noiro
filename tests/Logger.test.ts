@@ -1,19 +1,24 @@
+import { log } from "node:console";
 import { LogSeverity } from "../src/index.js"
 import { Logger } from "../src/logger.js"
-import { describe, it, expect, vi } from "vitest"
+import { describe, it, expect, vi, beforeAll } from "vitest"
 
 describe('Logger', () => {
+    const repository = {
+        saveLog: vi.fn(),
+        readLogs: vi.fn(),
+        deleteLogs: vi.fn(),
+    };
+
+    const logger = new Logger(repository);
+
+    beforeAll(() => {
+        vi.clearAllMocks();
+    })
 
     it('should call readLogs with severity', async () => {
 
-        const repository = {
-            saveLog: vi.fn(),
-            readLogs: vi.fn()
-        };
-
         repository.readLogs.mockResolvedValue([]);
-
-        const logger = new Logger(repository);
 
         await logger.getLogsBySeverity(LogSeverity.info);
 
@@ -23,14 +28,7 @@ describe('Logger', () => {
 
     it('should read all logs', async () => {
 
-        const repository = {
-            saveLog: vi.fn(),
-            readLogs: vi.fn(),
-        };
-
         repository.readLogs.mockResolvedValue([]);
-
-        const logger = new Logger(repository);
 
         await logger.getAllLogs();
 
@@ -63,14 +61,7 @@ describe('Logger', () => {
         "should save $method log",
         async ({ method, severity }) => {
 
-            const repository = {
-                saveLog: vi.fn(),
-                readLogs: vi.fn(),
-            };
-
             repository.saveLog.mockResolvedValue(true);
-
-            const logger = new Logger(repository);
 
             await logger[method](`Testing ${severity}`);
 
@@ -78,4 +69,21 @@ describe('Logger', () => {
         }
     );
 
-})
+    it('should delete logs', async() => {
+        repository.deleteLogs.mockResolvedValue(true);
+
+        const itWasDeleted = await logger.deleteLogs();
+
+        expect(itWasDeleted).toBeTruthy();
+        expect(repository.deleteLogs).toHaveBeenCalled();
+    });
+
+    it('should delete logs with arguments',async () => {
+        repository.deleteLogs.mockResolvedValue(true);
+
+        await logger.deleteLogs({level: LogSeverity.debug, olderThan: 2, origin: 'test'});
+
+        expect(repository.deleteLogs).toHaveBeenCalledWith({level: LogSeverity.debug, olderThan: 2, origin: 'test'});
+    });
+
+});

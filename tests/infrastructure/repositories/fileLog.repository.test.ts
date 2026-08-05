@@ -1,12 +1,16 @@
-import { it, expect, describe, beforeEach } from "vitest"
+import { it, expect, describe, beforeEach, vi, afterEach } from "vitest"
 import { LogSeverity } from "../../../src/index.js";
-import { FileLogRepository } from "../../../src/infrastructure/repositories/fileLog.repository.js";
+import { FileLogRepository } from "../../../src/infrastructure/repositories/file-log.repository.js";
 import { existsSync, rmSync } from 'fs';
+import fs from 'fs/promises';
 import { LogEntity } from "../../../src/domain/entities/log.entity.js";
+import { join } from "path";
 
 const testPath = 'tests-logs';
 
 describe('FileLog Repository', () => {
+    fs.writeFile = vi.fn();
+
     beforeEach(() => {
 
         if (existsSync(testPath)) {
@@ -17,6 +21,10 @@ describe('FileLog Repository', () => {
         };
     });
 
+    afterEach(() => {
+        vi.clearAllMocks();
+    })
+
     it('should create a directory', async () => {
 
         await FileLogRepository.create({ path: testPath });
@@ -25,7 +33,7 @@ describe('FileLog Repository', () => {
 
     });
 
-    it.each(Object.values(LogSeverity) as LogSeverity[])('should save logs with $s severity', async (severity) => {
+    it.each(Object.values(LogSeverity) as LogSeverity[])('should save logs with %s severity', async (severity) => {
         const repository = await FileLogRepository.create({ path: testPath });
 
         const log = new LogEntity({
@@ -79,6 +87,39 @@ describe('FileLog Repository', () => {
             expect(log?.origin).toBe(origin)
 
         };
+
+    });
+
+
+    it('should delete all content from each .log file ', async () => {
+
+        const repository = await FileLogRepository.create();
+
+        const itWasDeleted = repository.deleteLogs();
+
+        expect(itWasDeleted).toBeTruthy();
+        expect(fs.writeFile).toHaveBeenCalled();
+        expect(fs.writeFile).toHaveBeenCalledWith(expect.any(String), '');
+    });
+
+    it('should delete logs by options', async () => {
+        
+        const repository = await FileLogRepository.create({path: testPath});
+        const log = new LogEntity({
+            level: LogSeverity.debug,
+            message: 'test-message',
+            origin: 'fileLog test',
+            service: 'testing',
+        });
+
+        repository.saveLog(log);
+
+        await repository.deleteLogs({ level: LogSeverity.debug, olderThan: 1, origin: log.origin});
+
+
+        expect(fs.writeFile).toHaveBeenCalled();
+        expect(fs.writeFile).toHaveBeenCalledTimes((await fs.readdir(testPath)).length);
+
 
     });
 

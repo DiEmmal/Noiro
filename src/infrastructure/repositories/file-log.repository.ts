@@ -98,10 +98,14 @@ export class FileLogRepository implements LogRepository {
             ));
     };
 
-
-
     private async directoryVerification(): Promise<void> {
         await fs.mkdir(this.path, { recursive: true });
+        await fs.appendFile(join(this.path, this.logsFiles.all), '');
+        await fs.appendFile(join(this.path, this.logsFiles.debug), '');
+        await fs.appendFile(join(this.path, this.logsFiles.info), '');
+        await fs.appendFile(join(this.path, this.logsFiles.warn), '');
+        await fs.appendFile(join(this.path, this.logsFiles.error), '');
+        await fs.appendFile(join(this.path, this.logsFiles.fatal), '');
     };
 
 };
