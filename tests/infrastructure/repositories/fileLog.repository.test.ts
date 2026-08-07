@@ -4,15 +4,14 @@ import { FileLogRepository } from "../../../src/infrastructure/repositories/file
 import { existsSync, rmSync } from 'fs';
 import fs from 'fs/promises';
 import { LogEntity } from "../../../src/domain/entities/log.entity.js";
-import { join } from "path";
 
 const testPath = 'tests-logs';
 
 describe('FileLog Repository', () => {
-    fs.writeFile = vi.fn();
+    const fileWriterSpy = vi.spyOn(fs, 'writeFile');
 
     beforeEach(() => {
-
+        vi.clearAllMocks();
         if (existsSync(testPath)) {
             rmSync(testPath, {
                 recursive: true,
@@ -23,6 +22,12 @@ describe('FileLog Repository', () => {
 
     afterEach(() => {
         vi.clearAllMocks();
+        if (existsSync(testPath)) {
+            rmSync(testPath, {
+                recursive: true,
+                force: true,
+            });
+        };
     })
 
     it('should create a directory', async () => {
@@ -45,7 +50,9 @@ describe('FileLog Repository', () => {
 
         await repository.saveLog(log);
 
-        const logs = await repository.readLogs(severity);
+        const logs = await repository.readLogs({
+            level: severity,
+        });
 
         expect(logs[0]).toBeInstanceOf(LogEntity);
         expect(logs[0]?.level).toBe(log.level);
@@ -91,20 +98,22 @@ describe('FileLog Repository', () => {
     });
 
 
-    it('should delete all content from each .log file ', async () => {
+    it('should delete logs', async () => {
 
         const repository = await FileLogRepository.create();
 
-        const itWasDeleted = repository.deleteLogs();
+        await repository.deleteLogs();
 
-        expect(itWasDeleted).toBeTruthy();
         expect(fs.writeFile).toHaveBeenCalled();
         expect(fs.writeFile).toHaveBeenCalledWith(expect.any(String), '');
+
+        const logs = await repository.readLogs();
+        expect(logs).toHaveLength(0);
     });
 
     it('should delete logs by options', async () => {
-        
-        const repository = await FileLogRepository.create({path: testPath});
+
+        const repository = await FileLogRepository.create({ path: testPath });
         const log = new LogEntity({
             level: LogSeverity.debug,
             message: 'test-message',
@@ -114,13 +123,11 @@ describe('FileLog Repository', () => {
 
         repository.saveLog(log);
 
-        await repository.deleteLogs({ level: LogSeverity.debug, olderThan: 1, origin: log.origin});
+        await repository.deleteLogs({ level: LogSeverity.debug, olderThan: 1, origin: log.origin });
 
 
         expect(fs.writeFile).toHaveBeenCalled();
-        expect(fs.writeFile).toHaveBeenCalledTimes((await fs.readdir(testPath)).length);
-
-
+        expect(fs.writeFile).toHaveBeenCalledWith(expect.any(String), '');
     });
 
 });

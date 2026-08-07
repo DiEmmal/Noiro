@@ -55,7 +55,7 @@ describe('Log Entity', () => {
 
     it('should calculate if a log entity is older than a number of days', () => {
 
-        const isOlderThan = LogEntity.isOlderThan(newLogEntity, 1);
+        const isOlderThan = newLogEntity.isOlderThan(1);
 
         expect(isOlderThan).toBeFalsy();
     });
@@ -63,14 +63,12 @@ describe('Log Entity', () => {
     it('should throw an error if we provide an invalid JSON', () => {
 
         try {
-            const log = LogEntity.fromJSON('{lsdfjald:saldkfjad');
+            const log = LogEntity.fromJSON('{lsdfjald:saldkfjad}');
             expect(true).toBeFalsy();
         } catch (error) {
             expect(true).toBeTruthy();
         };
 
     });
-
-    
 
 });
