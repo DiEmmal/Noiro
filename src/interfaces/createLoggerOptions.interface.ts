@@ -3,10 +3,10 @@ export interface CreateLoggerOptions {
     file?: FileRepositoryOptions,
 };
 
-export interface FileRepositoryOptions {
-    path?:string,
-};
-
 export interface LoggerOptions {
     service?: string,
 }
+
+export interface FileRepositoryOptions {
+    path?:string,
+};

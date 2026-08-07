@@ -1,8 +1,9 @@
+import type { Days } from "../days.type.js";
 import type { LogSeverity } from "../enums/logSeverity.enum.js";
-import type { Days } from "../types/days.type.js";
 
-export interface DeleteLogsOptions {
+
+export interface FilterLogsOptions {
     olderThan?: Days;
     level?: LogSeverity;
     origin?: string;
-}
+};

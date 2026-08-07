@@ -1,12 +1,14 @@
+import type { LogRepository } from "./domain/repositories/log.repository.js";
 import { FileLogRepository } from "./infrastructure/repositories/file-log.repository.js";
 import type { CreateLoggerOptions } from "./interfaces/createLoggerOptions.interface.js";
 import { Logger } from "./logger.js"
 
 export const createLogger = async (options: CreateLoggerOptions = {}): Promise<Logger> => {
-    const fileLogRepository = await FileLogRepository.create(options.file);
+    const repositories: LogRepository[] = [];
+    repositories.push(await FileLogRepository.create(options.file));
 
     return new Logger(
-        fileLogRepository,
+        repositories,
         options.logger,
     );
 };

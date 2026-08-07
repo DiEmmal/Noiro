@@ -1,6 +1,7 @@
-import { LogSeverity } from "../enums/logSeverity.enum.js";
-import type { CreateLogEntity } from "../interfaces/createLogEntity.interface.js";
+import { LogSeverity } from "../types/enums/logSeverity.enum.js";
+import type { CreateLogEntity } from "../types/interfaces/createLogEntity.interface.js";
 import type { Days } from "../types/days.type.js"
+import type { FilterLogsOptions } from "../types/interfaces/filterLogsOptions.interface.js";
 
 export class LogEntity {
     message: string;
@@ -17,30 +18,17 @@ export class LogEntity {
         this.origin = log.origin;
     };
 
-    static fromJSON(content: string): LogEntity {
+    public static fromJSON(content: string): LogEntity {
         let log: any;
         try {
             log = JSON.parse(content);
         } catch (error) {
 
-            throw (`fromJSON: invalid JSON`);
+            throw new Error(`fromJSON: invalid JSON`);
 
         };
 
-        if (typeof log !== "object" || log === null) throw new Error('The log is not an object');
-
-        if (typeof log.message !== 'string') throw new Error('The log has not a valid message property');
-
-        if (typeof log.service !== 'string') throw new Error('The log has not a valid service property');
-
-        if (typeof log.origin !== 'string') throw new Error('The log has not a valid origin property');
-
-        if (!Object.values(LogSeverity).includes(log.level)) throw new Error('The log has not a valid level property');
-
-        if (log.timestamp && typeof log.timestamp === 'string') {
-            const date = new Date(log.timestamp);
-            if (isNaN(date.getTime())) throw new Error('The log has not a valid timestamp property');
-        } else throw new Error('The log has not a valid timestamp property');
+        LogEntity.validateLog(log);
 
         const newLog: LogEntity = new LogEntity({
             ...log,
@@ -51,13 +39,41 @@ export class LogEntity {
 
     };
 
-    public static isOlderThan(log: LogEntity, days: Days) {
+    private static validateLog(log: any) {
+        if (typeof log !== "object" || log === null) throw new Error('The log is not an object');
+
+        if (!log.message) throw new Error('There is not message property');
+        if (typeof log.message !== 'string') throw new Error('The log has not a valid message property');
+
+        if (!log.service) throw new Error('There is not service property');
+        if (typeof log.service !== 'string') throw new Error('The log has not a valid service property');
+
+        if (!log.origin) throw new Error('There is not origin property');
+        if (typeof log.origin !== 'string') throw new Error('The log has not a valid origin property');
+
+        if (!log.level) throw new Error('There is not level property');
+        if (!Object.values(LogSeverity).includes(log.level)) throw new Error('The log has not a valid level property');
+
+        if (!log.timestamp) throw new Error('There is not timestamp property');
+        if (typeof log.timestamp !== 'string'
+            || Number.isNaN(new Date(log.timestamp).getTime())) {
+            throw new Error('The log has not a valid timestamp property');
+        }
+    };
+
+    public isOlderThan(days: Days): boolean {
 
         const miliseconds = days * 1000 * 60 * 60 * 24;
 
-        return Date.now() - log.timestamp.getTime() > miliseconds;
+        return Date.now() - this.timestamp.getTime() > miliseconds;
 
-    }
+    };
 
+    public static filterLog(log: LogEntity, options: FilterLogsOptions) {
+        if (options.level && log.level !== options.level) return false;
+        if (options.origin && log.origin !== options.origin) return false;
+        if (options.olderThan && !log.isOlderThan(options.olderThan)) return false;
+        return true;
+    };
 
 };

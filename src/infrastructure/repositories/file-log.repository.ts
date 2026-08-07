@@ -1,10 +1,10 @@
 import fs from 'fs/promises';
 import { LogEntity, } from '../../domain/entities/log.entity.js';
 import type { LogRepository } from '../../domain/repositories/log.repository.js';
-import { LogSeverity } from '../../domain/enums/logSeverity.enum.js';
+import { LogSeverity } from '../../domain/types/enums/logSeverity.enum.js';
 import type { FileRepositoryOptions } from '../../interfaces/createLoggerOptions.interface.js';
 import { join } from 'node:path';
-import type { DeleteLogsOptions } from '../../domain/interfaces/deleteLogsOptions.interface.js';
+import type { FilterLogsOptions } from '../../domain/types/interfaces/filterLogsOptions.interface.js';
 
 
 export class FileLogRepository implements LogRepository {
@@ -19,33 +19,32 @@ export class FileLogRepository implements LogRepository {
         "fatal": 'fatalLogs.log',
     };
 
-    private constructor(options: FileRepositoryOptions) {
-        this.path = options.path ?? 'logs';
+    private constructor(options?: FileRepositoryOptions) {
+        this.path = options?.path ?? 'logs';
     };
 
-    static async create(options: FileRepositoryOptions = {}) {
+    static async create(options?: FileRepositoryOptions) {
         const repository = new FileLogRepository(options);
         await repository.directoryVerification();
         return repository;
     };
 
-    async readLogs(severity?: LogSeverity): Promise<LogEntity[]> {
-        let path: string;
-        if (severity) path = join(this.path, this.logsFiles[severity]);
-        else path = join(this.path, this.logsFiles.all);
+    async readLogs(options?: FilterLogsOptions): Promise<LogEntity[]> {
+        const logs = await this.readAllLogs();
+        if (!options) return logs
 
-        const fileContent = await fs.readFile(path, 'utf-8');
+        return logs.filter(log => LogEntity.filterLog(log, options));
+    };
 
-        if (fileContent === '') return [];
+    private async readAllLogs(): Promise<LogEntity[]> {
+        const content = await fs.readFile(join(this.path, this.logsFiles.all), 'utf-8');
+        const trimmedContent = content.trim();
+        if (trimmedContent === '') return [];
 
-        const stringLogs = fileContent
-            .trim()
-            .split("\n");
-
-        const logs = stringLogs
+        const logs = trimmedContent
+            .split("\n")
             .map(log => LogEntity.fromJSON(log));
-
-        return logs;
+        return logs
     };
 
     async saveLog(log: LogEntity): Promise<void> {
@@ -59,36 +58,16 @@ export class FileLogRepository implements LogRepository {
 
     };
 
-    async deleteLogs(options: DeleteLogsOptions = {}): Promise<void> {
-        if (Object.keys(options).length === 0) {
-            await this.deleteAllLogs();
-            return;
-        }
+    async deleteLogs(options: FilterLogsOptions = {}): Promise<void> {
+        const logs = this.readAllLogs();
 
-        const allLogs: Record<LogSeverity, LogEntity[]> = { debug: [], error: [], fatal: [], info: [], warn: [] };
-
-        for (let level of Object.values(LogSeverity)) {
-            allLogs[level] = await this.readLogs(level);
-        };
-
-        const filterLogs = (log: LogEntity): boolean => {
-            if (options.level && log.level === options.level) return false;
-            if (options.origin && log.origin === options.origin) return false;
-            if(options.olderThan && LogEntity.isOlderThan(log, options.olderThan)) return false;
-            return true;
-        };
-
-        for (let level of Object.values(LogSeverity)) {
-            allLogs[level] = allLogs[level].filter(log => filterLogs(log));
-        };
+        const remainingLogs = (await logs).filter(log => !LogEntity.filterLog(log, options));
 
         await this.deleteAllLogs();
 
-        for(let level of Object.values(LogSeverity)) {
-            for (const log of allLogs[level]) await this.saveLog(log);
+        for (const log of remainingLogs) {
+            await this.saveLog(log);
         };
-
-        return;
     };
 
     private async deleteAllLogs(): Promise<void> {
@@ -100,12 +79,11 @@ export class FileLogRepository implements LogRepository {
 
     private async directoryVerification(): Promise<void> {
         await fs.mkdir(this.path, { recursive: true });
-        await fs.appendFile(join(this.path, this.logsFiles.all), '');
-        await fs.appendFile(join(this.path, this.logsFiles.debug), '');
-        await fs.appendFile(join(this.path, this.logsFiles.info), '');
-        await fs.appendFile(join(this.path, this.logsFiles.warn), '');
-        await fs.appendFile(join(this.path, this.logsFiles.error), '');
-        await fs.appendFile(join(this.path, this.logsFiles.fatal), '');
+        await Promise.all(
+            Object.values(this.logsFiles).map(
+                file => fs.appendFile(join(this.path, file), '')
+            )
+        );
     };
 
 };

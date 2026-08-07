@@ -4,23 +4,24 @@
 
 ## Installation
 
-This library has not prod dependencies
+This library has no production dependencies.
 
 To run the examples use the next scripts:
 
 ```bash
 npx tsx examples/create-logs.example.ts
-npx tsx examples/read-logs.example.ts
-npx tsx examples/read-logs-by-severity.example.ts
+npx tsx examples/read-all-logs.example.ts
+npx tsx examples/read-logs-by-options.example.ts
 npx tsx examples/delete-all-logs.example.ts
-npx tsx examples/delete-logs-by-options.ts
+npx tsx examples/delete-logs-by-options.example.ts
 ```
 
 
 ## Features
 
 - Write logs with multiple severity levels.
-- Read logs by severity.
+- Read logs with severity, origin, and age filters.
+- Delete logs with severity, origin, and age filters.
 - JSON-based log storage.
 - TypeScript support.
 
@@ -44,7 +45,7 @@ await logger.warn('This is a warn log');
 await logger.error('This is an error log');
 await logger.fatal('This is a fatal log');
 
-const logs = await logger.getLogsBySeverity(LogSeverity.error);
+const logs = await logger.getLogs({ level: LogSeverity.error });
 
 console.log(logs);
 
@@ -63,19 +64,16 @@ await logger.error(message, origin);
 await logger.fatal(message);
 ```
 
-### Reading logs
+### Reading logs and deleting logs
 
 ```ts
-await logger.getLogsBySeverity(severity);
+await logger.getLogs();
+await logger.getLogs({ level: LogSeverity.error });
+await logger.deleteLogs();
+await logger.deleteLogs({ olderThan: 7, origin: 'api' });
 ```
 
-Returns an array of `LogEntity`.
-
-### Deleting logs
-
-```ts
-await logger.deleteLogs({ level, olderThan, origin });
-```
+`FilterLogsOptions = { level?: LogSeverity, olderThan?: number, origin?: string }`
 
 ### LogEntity
 
@@ -95,10 +93,10 @@ interface LogEntity {
 src/
   domain/
     entities/
-    enums/
-    interfaces/
     repositories/
     types/
+      enums/
+      interfaces/
   infrastructure/
     repositories/
   interfaces/

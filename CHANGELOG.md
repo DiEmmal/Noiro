@@ -51,3 +51,11 @@
 
 * Added new method `deleteLogs()`.
 * Refactored file repository path unions.
+
+## 1.4.1 - 2026-08-07
+
+* Refactored log filtering with the new `FilterLogsOptions` type.
+* Refactored the `Logger` API to use `getLogs()` for filtered and unfiltered reads.
+* Refactored the file repository read and delete flow to reuse shared filtering logic.
+* Refactored domain types into `domain/types/enums` and `domain/types/interfaces`.
+* Improved `LogEntity` validation and age filtering helpers.
