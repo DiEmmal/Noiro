@@ -59,3 +59,12 @@
 * Refactored the file repository read and delete flow to reuse shared filtering logic.
 * Refactored domain types into `domain/types/enums` and `domain/types/interfaces`.
 * Improved `LogEntity` validation and age filtering helpers.
+
+## 1.5.0 - 2026-08-29
+
+* Added a transport-based repository factory to support file-backed logging configuration more cleanly.
+* Split datasource and repository responsibilities to follow a clearer architecture.
+* Added compatibility for the legacy `file` configuration while keeping the modern `transport` shape.
+* Refined the public logger configuration API and documentation.
+* Added and corrected example scripts and test coverage for the datasource and logger flow.
+* Ensured the project passes its test suite and build validation.
