@@ -1,4 +1,3 @@
-import { log } from "node:console";
 import { LogSeverity } from "../src/index.js"
 import { Logger } from "../src/logger.js"
 import { describe, it, expect, vi, beforeAll } from "vitest"
@@ -10,7 +9,7 @@ describe('Logger', () => {
         deleteLogs: vi.fn(),
     };
 
-    const logger = new Logger([repository]);
+    const logger = new Logger(repository);
 
     beforeAll(() => {
         vi.clearAllMocks();
@@ -69,14 +68,14 @@ describe('Logger', () => {
         }
     );
 
-    // it('should delete logs', async() => {
-    //     repository.deleteLogs.mockResolvedValue(true);
+    it('should delete logs', async() => {
+        repository.deleteLogs.mockResolvedValue(true);
 
-    //     const itWasDeleted = await logger.deleteLogs();
+        const itWasDeleted = await logger.deleteLogs();
 
-    //     expect(itWasDeleted).toBeTruthy();
-    //     expect(repository.deleteLogs).toHaveBeenCalled();
-    // });
+        expect(itWasDeleted).toBeTruthy();
+        expect(repository.deleteLogs).toHaveBeenCalled();
+    });
 
     it('should delete logs with arguments',async () => {
         repository.deleteLogs.mockResolvedValue(true);

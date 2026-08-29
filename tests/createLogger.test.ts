@@ -4,7 +4,8 @@ import { describe, it, expect } from "vitest"
 
 const path = 'tests-logs'
 const logger = await createLogger({
-    file: {
+    transport: {
+        type: 'file',
         path
     },
     logger: {

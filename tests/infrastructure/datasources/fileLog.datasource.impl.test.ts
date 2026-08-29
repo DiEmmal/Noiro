@@ -1,13 +1,13 @@
 import { it, expect, describe, beforeEach, vi, afterEach } from "vitest"
 import { LogSeverity } from "../../../src/index.js";
-import { FileLogRepository } from "../../../src/infrastructure/repositories/file-log.repository.js";
+import { FileLogDatasourceImpl } from "../../../src/infrastructure/datasources/file-log.datasource.impl.js";
 import { existsSync, rmSync } from 'fs';
 import fs from 'fs/promises';
 import { LogEntity } from "../../../src/domain/entities/log.entity.js";
 
 const testPath = 'tests-logs';
 
-describe('FileLog Repository', () => {
+describe('FileLog Datasource Implementation', () => {
     const fileWriterSpy = vi.spyOn(fs, 'writeFile');
 
     beforeEach(() => {
@@ -30,16 +30,16 @@ describe('FileLog Repository', () => {
         };
     })
 
-    it('should create a directory', async () => {
+    it('should create a directory (file)', async () => {
 
-        await FileLogRepository.create({ path: testPath });
+        await FileLogDatasourceImpl.create({ path: testPath });
 
         expect(existsSync(testPath)).toBe(true);
 
     });
 
     it.each(Object.values(LogSeverity) as LogSeverity[])('should save logs with %s severity', async (severity) => {
-        const repository = await FileLogRepository.create({ path: testPath });
+        const repository = await FileLogDatasourceImpl.create({ path: testPath });
 
         const log = new LogEntity({
             level: severity,
@@ -62,45 +62,38 @@ describe('FileLog Repository', () => {
 
     });
 
-    it('should read and return all logs', async () => {
-        const repository = await FileLogRepository.create({ path: testPath });
+    it('should read and return all logs (file)', async () => {
+        const repository = await FileLogDatasourceImpl.create({ path: testPath });
         const severities = Object.values(LogSeverity);
         const service = 'test', origin = 'test.ts';
 
-        await Promise.all([
-            severities.forEach(severity => {
-
-                repository.saveLog(new LogEntity({
-                    level: severity,
-                    message: `Test ${severity} message`,
-                    origin,
-                    service,
-                }));
-
-            })
-        ])
+        for (const severity of severities) {
+            await repository.saveLog(new LogEntity({
+                level: severity,
+                message: `Test ${severity} message`,
+                origin,
+                service,
+            }));
+        }
 
         const logs = await repository.readLogs();
 
         expect(logs).toHaveLength(severities.length);
 
-        for (let severity of severities) {
-
+        for (const severity of severities) {
             const log = logs.find(log => log.level === severity);
 
             expect(log?.level).toBe(severity);
-            expect(log?.message).toBe(`Test ${severity} message`)
-            expect(log?.service).toBe(service)
-            expect(log?.origin).toBe(origin)
-
-        };
-
+            expect(log?.message).toBe(`Test ${severity} message`);
+            expect(log?.service).toBe(service);
+            expect(log?.origin).toBe(origin);
+        }
     });
 
 
-    it('should delete logs', async () => {
+    it('should delete logs (file)', async () => {
 
-        const repository = await FileLogRepository.create();
+        const repository = await FileLogDatasourceImpl.create();
 
         await repository.deleteLogs();
 
@@ -111,9 +104,9 @@ describe('FileLog Repository', () => {
         expect(logs).toHaveLength(0);
     });
 
-    it('should delete logs by options', async () => {
+    it('should delete logs by options (file)', async () => {
 
-        const repository = await FileLogRepository.create({ path: testPath });
+        const repository = await FileLogDatasourceImpl.create({ path: testPath });
         const log = new LogEntity({
             level: LogSeverity.debug,
             message: 'test-message',

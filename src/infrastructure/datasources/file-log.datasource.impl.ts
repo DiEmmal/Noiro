@@ -1,13 +1,12 @@
 import fs from 'fs/promises';
 import { LogEntity, } from '../../domain/entities/log.entity.js';
 import type { LogRepository } from '../../domain/repositories/log.repository.js';
-import { LogSeverity } from '../../domain/types/enums/logSeverity.enum.js';
-import type { FileRepositoryOptions } from '../../interfaces/createLoggerOptions.interface.js';
+import type { FileTransportOptions } from '../../domain/types/interfaces/createLoggerOptions.interface.js';
 import { join } from 'node:path';
 import type { FilterLogsOptions } from '../../domain/types/interfaces/filterLogsOptions.interface.js';
 
 
-export class FileLogRepository implements LogRepository {
+export class FileLogDatasourceImpl implements LogRepository {
     path: string;
 
     private readonly logsFiles = {
@@ -19,12 +18,12 @@ export class FileLogRepository implements LogRepository {
         "fatal": 'fatalLogs.log',
     };
 
-    private constructor(options?: FileRepositoryOptions) {
+    private constructor(options?: FileTransportOptions) {
         this.path = options?.path ?? 'logs';
     };
 
-    static async create(options?: FileRepositoryOptions) {
-        const repository = new FileLogRepository(options);
+    static async create(options?: FileTransportOptions) {
+        const repository = new FileLogDatasourceImpl(options);
         await repository.directoryVerification();
         return repository;
     };

@@ -34,7 +34,8 @@ const logger = await createLogger({
   logger: {
     service: 'application-service',
   },
-  file: {
+  transport: {
+    type: 'file',
     path: 'example-logs',
   }
 });
@@ -92,14 +93,15 @@ interface LogEntity {
 ```
 src/
   domain/
+    datasources/
     entities/
     repositories/
     types/
       enums/
       interfaces/
   infrastructure/
+    datasources/
     repositories/
-  interfaces/
   createLogger.ts
   index.ts
   logger.ts
