@@ -1,7 +1,4 @@
-import { LogDatasource } from "../../domain/datasources/log.datasource.js";
-import type { LogEntity } from "../../domain/entities/log.entity.js";
-import { LogRepository } from "../../domain/repositories/log.repository.js";
-import type { FilterLogsOptions } from "../../domain/types/interfaces/filterLogsOptions.interface.js";
+import { type FilterLogsOptions, type FileTransportOptions, LogEntity, LogRepository, LogDatasource } from "../../domain/index.js";
 
 export class FileLogRepositoryImpl implements LogRepository {
 

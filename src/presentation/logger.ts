@@ -1,8 +1,4 @@
-import { LogEntity } from "./domain/entities/log.entity.js";
-import type { LogRepository } from "./domain/repositories/log.repository.js";
-import { LogSeverity } from "./domain/types/enums/logSeverity.enum.js";
-import type { LoggerOptions } from "./domain/types/interfaces/createLoggerOptions.interface.js";
-import type { FilterLogsOptions } from "./domain/types/interfaces/filterLogsOptions.interface.js";
+import { type FilterLogsOptions, type LoggerOptions, LogSeverity, LogRepository, LogEntity } from "../domain/index.js";
 
 export class Logger {
     private readonly service: string;

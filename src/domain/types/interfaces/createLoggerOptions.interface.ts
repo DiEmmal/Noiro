@@ -9,7 +9,7 @@ export interface LoggerOptions {
 };
 
 export interface FileTransportOptions {
-    type?: 'file',
+    type: 'file',
     path?: string,
 };
 

@@ -1,6 +1,5 @@
 import { describe, it, expect, } from "vitest";
-import { LogEntity } from "../../../src/domain/entities/log.entity.js";
-import { LogSeverity } from "../../../src/index.js";
+import { LogSeverity, LogEntity } from "../../../src/domain/index.js";
 
 describe('Log Entity', () => {
     const newLog = {

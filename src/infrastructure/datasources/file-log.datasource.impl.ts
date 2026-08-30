@@ -1,9 +1,6 @@
 import fs from 'fs/promises';
-import { LogEntity, } from '../../domain/entities/log.entity.js';
-import type { LogRepository } from '../../domain/repositories/log.repository.js';
-import type { FileTransportOptions } from '../../domain/types/interfaces/createLoggerOptions.interface.js';
 import { join } from 'node:path';
-import type { FilterLogsOptions } from '../../domain/types/interfaces/filterLogsOptions.interface.js';
+import { LogRepository, type FileTransportOptions, type FilterLogsOptions, LogEntity } from '../../domain/index.js';
 
 
 export class FileLogDatasourceImpl implements LogRepository {

@@ -1,5 +1,5 @@
-import { LogSeverity } from "../src/index.js"
-import { Logger } from "../src/logger.js"
+import { LogSeverity } from "../src/domain/index.js"
+import { Logger } from "../src/presentation/logger.js"
 import { describe, it, expect, vi, beforeAll } from "vitest"
 
 describe('Logger', () => {

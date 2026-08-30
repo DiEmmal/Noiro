@@ -68,3 +68,7 @@
 * Refined the public logger configuration API and documentation.
 * Added and corrected example scripts and test coverage for the datasource and logger flow.
 * Ensured the project passes its test suite and build validation.
+
+## 1.5.1 - 2026-08-30
+
+* Refactored architecture and standardized barrel imports

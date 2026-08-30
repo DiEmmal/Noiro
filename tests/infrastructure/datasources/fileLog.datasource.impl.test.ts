@@ -1,9 +1,8 @@
 import { it, expect, describe, beforeEach, vi, afterEach } from "vitest"
-import { LogSeverity } from "../../../src/index.js";
-import { FileLogDatasourceImpl } from "../../../src/infrastructure/datasources/file-log.datasource.impl.js";
+import { FileLogDatasourceImpl } from "../../../src/infrastructure/index.js";
 import { existsSync, rmSync } from 'fs';
 import fs from 'fs/promises';
-import { LogEntity } from "../../../src/domain/entities/log.entity.js";
+import { LogSeverity, LogEntity,  } from "../../../src/domain/index.js";
 
 const testPath = 'tests-logs';
 
@@ -32,14 +31,14 @@ describe('FileLog Datasource Implementation', () => {
 
     it('should create a directory (file)', async () => {
 
-        await FileLogDatasourceImpl.create({ path: testPath });
+        await FileLogDatasourceImpl.create({ type: 'file', path: testPath });
 
         expect(existsSync(testPath)).toBe(true);
 
     });
 
     it.each(Object.values(LogSeverity) as LogSeverity[])('should save logs with %s severity', async (severity) => {
-        const repository = await FileLogDatasourceImpl.create({ path: testPath });
+        const repository = await FileLogDatasourceImpl.create({ type: 'file', path: testPath });
 
         const log = new LogEntity({
             level: severity,
@@ -63,7 +62,7 @@ describe('FileLog Datasource Implementation', () => {
     });
 
     it('should read and return all logs (file)', async () => {
-        const repository = await FileLogDatasourceImpl.create({ path: testPath });
+        const repository = await FileLogDatasourceImpl.create({type: 'file', path: testPath});
         const severities = Object.values(LogSeverity);
         const service = 'test', origin = 'test.ts';
 
@@ -93,7 +92,7 @@ describe('FileLog Datasource Implementation', () => {
 
     it('should delete logs (file)', async () => {
 
-        const repository = await FileLogDatasourceImpl.create();
+        const repository = await FileLogDatasourceImpl.create({type: 'file', path: testPath});
 
         await repository.deleteLogs();
 
@@ -106,7 +105,7 @@ describe('FileLog Datasource Implementation', () => {
 
     it('should delete logs by options (file)', async () => {
 
-        const repository = await FileLogDatasourceImpl.create({ path: testPath });
+        const repository = await FileLogDatasourceImpl.create({type: 'file', path: testPath});
         const log = new LogEntity({
             level: LogSeverity.debug,
             message: 'test-message',

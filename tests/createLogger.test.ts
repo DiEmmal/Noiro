@@ -1,5 +1,5 @@
 import { createLogger } from "../src/index.js"
-import { Logger } from "../src/logger.js"
+import { Logger } from "../src/presentation/logger.js"
 import { describe, it, expect } from "vitest"
 
 const path = 'tests-logs'
