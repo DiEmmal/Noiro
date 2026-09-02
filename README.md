@@ -4,9 +4,19 @@
 
 ## Installation
 
-This library has no production dependencies.
+To use all transports, install the project dependencies:
 
-To run the examples use the next scripts:
+```bash
+npm install
+```
+
+To use only the file transport, install the file example dependency:
+
+```bash
+npm install --save-dev tsx
+```
+
+To run the examples, use the following commands:
 
 ```bash
 npx tsx examples/create-logs.example.ts
@@ -16,6 +26,17 @@ npx tsx examples/delete-all-logs.example.ts
 npx tsx examples/delete-logs-by-options.example.ts
 ```
 
+To run the MongoDB examples with Docker:
+
+```bash
+docker compose up -d
+npx tsx examples/mongo-examples/create-logs.example.ts
+npx tsx examples/mongo-examples/read-logs.example.ts
+npx tsx examples/mongo-examples/delete-logs.example.ts
+docker compose down
+```
+
+The examples use the local MongoDB connection `mongodb://noiro:123456@localhost:27017/?authSource=admin` and the `noiro-logs` database.
 
 ## Features
 
@@ -24,27 +45,32 @@ npx tsx examples/delete-logs-by-options.example.ts
 - Delete logs with severity, origin, and age filters.
 - JSON-based log storage.
 - TypeScript support.
+- File-based and MongoDB log transports.
+- MongoDB filtering by severity, origin, and age.
+- Configurable file path and MongoDB database connection.
 
 ## Quick start
+
+### File Transport
 
 ```ts
 import { createLogger, LogSeverity } from "../src/index.js";
 
 const logger = await createLogger({
   logger: {
-    service: 'application-service',
+    service: "application-service",
   },
   transport: {
-    type: 'file',
-    path: 'example-logs',
-  }
+    type: "file",
+    path: "example-logs",
+  },
 });
 
-await logger.debug('This is a debug log');
-await logger.info('This is an info log');
-await logger.warn('This is a warn log');
-await logger.error('This is an error log');
-await logger.fatal('This is a fatal log');
+await logger.debug("This is a debug log");
+await logger.info("This is an info log");
+await logger.warn("This is a warn log");
+await logger.error("This is an error log");
+await logger.fatal("This is a fatal log");
 
 const logs = await logger.getLogs({ level: LogSeverity.error });
 
@@ -52,6 +78,32 @@ console.log(logs);
 
 await logger.deleteLogs();
 ```
+
+### MongoDB transport
+
+```ts
+import { createLogger } from 'noiro';
+
+const logger = await createLogger({
+  logger: {
+    service: 'application-service',
+  },
+  transport: {
+    type: 'mongo',
+    url: 'mongodb://localhost:27017',
+    databaseName: 'application-logs',
+  },
+});
+
+await logger.info('User authenticated', 'auth');
+
+const logs = await logger.getLogs({
+  level: 'info',
+  origin: 'auth',
+});
+```
+
+MongoDB must be running before creating a logger with the MongoDB transport.
 
 ## API
 
@@ -71,7 +123,7 @@ await logger.fatal(message);
 await logger.getLogs();
 await logger.getLogs({ level: LogSeverity.error });
 await logger.deleteLogs();
-await logger.deleteLogs({ olderThan: 7, origin: 'api' });
+await logger.deleteLogs({ olderThan: 7, origin: "api" });
 ```
 
 `FilterLogsOptions = { level?: LogSeverity, olderThan?: number, origin?: string }`
@@ -80,11 +132,11 @@ await logger.deleteLogs({ olderThan: 7, origin: 'api' });
 
 ```ts
 interface LogEntity {
-    message: string;
-    level: LogSeverity;
-    timestamp: Date;
-    service: string;
-    origin: string;
+  message: string;
+  level: LogSeverity;
+  timestamp: Date;
+  service: string;
+  origin: string;
 }
 ```
 
@@ -100,14 +152,19 @@ src/
       enums/
       interfaces/
   infrastructure/
+    data/
+      mongo/
+        models/
     datasources/
     repositories/
-  createLogger.ts
+  presentation/
+    createLogger.ts
+    logger.ts
   index.ts
-  logger.ts
 examples/
 logs/
 ```
+
 ## Notes
 
 This repository is meant to show my learning process honestly.

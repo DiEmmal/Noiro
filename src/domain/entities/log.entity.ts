@@ -36,8 +36,18 @@ export class LogEntity {
         });
 
         return newLog;
-
     };
+
+    public static fromObject(log: any): LogEntity {
+        LogEntity.validateLog(log);
+
+        const newLog: LogEntity = new LogEntity({
+            ...log,
+            timestamp: new Date(log.timestamp),
+        });
+
+        return newLog;
+    }
 
     private static validateLog(log: any) {
         if (typeof log !== "object" || log === null) throw new Error('The log is not an object');
@@ -55,8 +65,10 @@ export class LogEntity {
         if (!Object.values(LogSeverity).includes(log.level)) throw new Error('The log has not a valid level property');
 
         if (!log.timestamp) throw new Error('There is not timestamp property');
-        if (typeof log.timestamp !== 'string'
-            || Number.isNaN(new Date(log.timestamp).getTime())) {
+        if (
+            !(log.timestamp instanceof Date) &&
+            (typeof log.timestamp !== 'string' || Number.isNaN(new Date(log.timestamp).getTime()))
+        ) {
             throw new Error('The log has not a valid timestamp property');
         }
     };

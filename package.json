@@ -1,6 +1,6 @@
 {
   "name": "noiro",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "description": "Simple logger using TS",
   "license": "ISC",
   "author": "DiEmmal",
@@ -21,5 +21,8 @@
     "tsx": "^4.23.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"
+  },
+  "dependencies": {
+    "mongoose": "^9.9.4"
   }
 }

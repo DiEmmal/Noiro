@@ -72,3 +72,11 @@
 ## 1.5.1 - 2026-08-30
 
 * Refactored architecture and standardized barrel imports
+
+## 1.6.0 - 2026-09-02
+
+* Added MongoDB as a second log transport.
+* Added MongoDB connection configuration through `createLogger()`.
+* Added MongoDB persistence for reading, writing, and deleting logs.
+* Added database-level filtering by severity, origin, and age.
+* Added a Mongoose schema for persisted log entries.

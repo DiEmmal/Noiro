@@ -13,4 +13,10 @@ export interface FileTransportOptions {
     path?: string,
 };
 
-export type TransportOptions = FileTransportOptions;
+export interface MongoTransportOptions{
+    type: 'mongo',
+    url: string,
+    databaseName: string,
+}
+
+export type TransportOptions = FileTransportOptions | MongoTransportOptions;
