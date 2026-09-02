@@ -9,3 +9,5 @@ example-logs/
 tests-logs/
 
 coverage/
+
+/mongo/
