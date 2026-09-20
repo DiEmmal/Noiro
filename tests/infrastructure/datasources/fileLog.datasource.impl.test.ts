@@ -2,13 +2,11 @@ import { it, expect, describe, beforeEach, vi, afterEach } from "vitest"
 import { FileLogDatasourceImpl } from "../../../src/infrastructure/index.js";
 import { existsSync, rmSync } from 'fs';
 import fs from 'fs/promises';
-import { LogSeverity, LogEntity,  } from "../../../src/domain/index.js";
+import { LogSeverity, LogEntity, } from "../../../src/domain/index.js";
 
 const testPath = 'tests-logs';
 
 describe('FileLog Datasource Implementation', () => {
-    const fileWriterSpy = vi.spyOn(fs, 'writeFile');
-
     beforeEach(() => {
         vi.clearAllMocks();
         if (existsSync(testPath)) {
@@ -61,8 +59,56 @@ describe('FileLog Datasource Implementation', () => {
 
     });
 
+    it('should rotate severity logs with numbered files when maxLogsPerFile is set', async () => {
+        const repository = await FileLogDatasourceImpl.create({
+            type: 'file',
+            path: testPath,
+            maxLogsPerFile: 2,
+        });
+
+        for (let index = 0; index < 3; index++) {
+            await repository.saveLog(new LogEntity({
+                level: LogSeverity.debug,
+                message: `debug message ${index}`,
+                origin: 'test.ts',
+                service: 'test',
+            }));
+        }
+
+        const firstFile = await fs.readFile(`${testPath}/debugLogs.log`, 'utf-8');
+        const secondFile = await fs.readFile(`${testPath}/debugLogs-1.log`, 'utf-8');
+
+        expect(firstFile.trim().split('\n')).toHaveLength(2);
+        expect(secondFile.trim().split('\n')).toHaveLength(1);
+        expect(secondFile).toContain('debug message 2');
+    });
+
+    it.each([true, false])('should respect allLogsFile=%s with rotated files', async (allLogsFile) => {
+        const repository = await FileLogDatasourceImpl.create({
+            type: 'file',
+            path: testPath,
+            allLogsFile,
+            maxLogsPerFile: 2,
+        });
+
+        for (let index = 0; index < 3; index++) {
+            await repository.saveLog(new LogEntity({
+                level: LogSeverity.info,
+                message: `info message ${index}`,
+                origin: 'test.ts',
+                service: 'test',
+            }));
+        }
+
+        expect(await repository.readLogs()).toHaveLength(3);
+
+        const allLogs = await fs.readFile(`${testPath}/allLogs.log`, 'utf-8');
+        expect(allLogs.trim() === '').toBe(!allLogsFile);
+        expect(existsSync(`${testPath}/allLogs`)).toBe(false);
+    });
+
     it('should read and return all logs (file)', async () => {
-        const repository = await FileLogDatasourceImpl.create({type: 'file', path: testPath});
+        const repository = await FileLogDatasourceImpl.create({ type: 'file', path: testPath });
         const severities = Object.values(LogSeverity);
         const service = 'test', origin = 'test.ts';
 
@@ -92,12 +138,9 @@ describe('FileLog Datasource Implementation', () => {
 
     it('should delete logs (file)', async () => {
 
-        const repository = await FileLogDatasourceImpl.create({type: 'file', path: testPath});
+        const repository = await FileLogDatasourceImpl.create({ type: 'file', path: testPath });
 
         await repository.deleteLogs();
-
-        expect(fs.writeFile).toHaveBeenCalled();
-        expect(fs.writeFile).toHaveBeenCalledWith(expect.any(String), '');
 
         const logs = await repository.readLogs();
         expect(logs).toHaveLength(0);
@@ -105,7 +148,7 @@ describe('FileLog Datasource Implementation', () => {
 
     it('should delete logs by options (file)', async () => {
 
-        const repository = await FileLogDatasourceImpl.create({type: 'file', path: testPath});
+        const repository = await FileLogDatasourceImpl.create({ type: 'file', path: testPath });
         const log = new LogEntity({
             level: LogSeverity.debug,
             message: 'test-message',
@@ -113,13 +156,12 @@ describe('FileLog Datasource Implementation', () => {
             service: 'testing',
         });
 
-        repository.saveLog(log);
+        await repository.saveLog(log);
 
-        await repository.deleteLogs({ level: LogSeverity.debug, olderThan: 1, origin: log.origin });
+        await repository.deleteLogs({ level: LogSeverity.debug, origin: log.origin });
 
-
-        expect(fs.writeFile).toHaveBeenCalled();
-        expect(fs.writeFile).toHaveBeenCalledWith(expect.any(String), '');
+        const logs = await repository.readLogs();
+        expect(logs).toHaveLength(0);
     });
 
 });

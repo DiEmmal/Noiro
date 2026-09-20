@@ -26,7 +26,7 @@ export class LogEntity {
 
             throw new Error(`fromJSON: invalid JSON`);
 
-        };
+        };  
 
         LogEntity.validateLog(log);
 

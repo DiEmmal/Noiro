@@ -80,3 +80,8 @@
 * Added MongoDB persistence for reading, writing, and deleting logs.
 * Added database-level filtering by severity, origin, and age.
 * Added a Mongoose schema for persisted log entries.
+
+## 1.6.1 - 2026-09-20
+
+* Refactored file datasource for better efficiency.
+* Added more options for file-based logging.

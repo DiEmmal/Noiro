@@ -6,4 +6,5 @@ const logs = await logger.getLogs({
     olderThan: 0,
     origin: 'create-logs.example.ts'
 });
+
 console.log(logs);
